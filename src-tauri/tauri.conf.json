@@ -44,11 +44,11 @@
       "coders_bible.db": "coders_bible.db"
     },
     "macOS": {
-      "entitlements": "",
+      "entitlements": null,
       "exceptionDomain": "",
       "frameworks": [],
-      "providerShortName": "",
-      "signingIdentity": ""
+      "providerShortName": null,
+      "signingIdentity": "-"
     }
   },
   "plugins": {
