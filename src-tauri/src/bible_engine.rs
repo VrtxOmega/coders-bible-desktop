@@ -4,7 +4,7 @@
 
 use regex::Regex;
 use rusqlite::{Connection, Result as SqlResult};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use std::collections::{HashMap, HashSet};
 
 // ─── Data Structures ───────────────────────────────────────
@@ -602,7 +602,6 @@ impl BibleEngine {
                     score,
                     matches: matched_patterns.len(),
                     matched_patterns,
-                    total_patterns: patterns.len(),
                     confidence: base_confidence,
                 });
             }
@@ -622,7 +621,6 @@ impl BibleEngine {
                     score: 10,
                     matches: 1,
                     matched_patterns: vec![format!("binary:{}", lead_token)],
-                    total_patterns: 1,
                     confidence: 0.75,
                 });
             }
@@ -641,7 +639,14 @@ impl BibleEngine {
         }
 
         let mut ranked: Vec<(String, LangScore)> = scores.into_iter().collect();
-        ranked.sort_by(|a, b| b.1.score.cmp(&a.1.score));
+        // Sort by confidence (primary), then by raw score (tiebreaker). Sorting by
+        // raw score alone caused false primaries when a less-likely language scored
+        // higher per-pattern but lower in normalized confidence.
+        ranked.sort_by(|a, b| {
+            b.1.confidence.partial_cmp(&a.1.confidence)
+                .unwrap_or(std::cmp::Ordering::Equal)
+                .then_with(|| b.1.score.cmp(&a.1.score))
+        });
 
         let primary = &ranked[0];
         let confidence = (primary.1.confidence * 100.0).round() / 100.0;
@@ -1255,6 +1260,5 @@ struct LangScore {
     score: i32,
     matches: usize,
     matched_patterns: Vec<String>,
-    total_patterns: usize,
     confidence: f64,
 }

@@ -23,3 +23,7 @@ Thumbs.db
 
 # Tauri
 src-tauri/gen/
+
+# CI-generated macOS icon (built from PNG sources by release.yml)
+src-tauri/icons/icon.icns
+src-tauri/icons/icon.iconset/
