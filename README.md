@@ -2,7 +2,26 @@
 
 > **Sovereign knowledge engine. Zero AI. Zero network. Pure signal.**
 
-The Coder's Bible is a fully offline developer knowledge base containing **67,213 curated code fragments** across **28 domains** — from Python and Rust to Docker, Kubernetes, Nginx, and systemd. This repository contains the **Tauri desktop app**, **PWA**, **VS Code extension**, and **CLI companion**.
+The Coder's Bible is a fully offline developer knowledge base containing **67,213 curated code fragments** across **25 domains** — from Python and Rust to Docker, Kubernetes, Nginx, and systemd. This repository contains the **Tauri desktop app** and **PWA assets**. The companion CLI lives at [`coders-bible-cli`](https://github.com/VrtxOmega/coders-bible-cli); the harvest pipeline + web frontend at [`the-coders-bible`](https://github.com/VrtxOmega/the-coders-bible).
+
+---
+
+## Download
+
+Pre-built installers for every release are on the [releases page](https://github.com/VrtxOmega/coders-bible-desktop/releases):
+
+| Platform | Asset |
+|---|---|
+| Windows | `Coder.s.Bible_2.1.0_x64_en-US.msi` |
+| macOS (Apple Silicon) | `Coder.s.Bible_2.1.0_aarch64.dmg` |
+| macOS (Intel) | `Coder.s.Bible_2.1.0_x64.dmg` |
+| Debian / Ubuntu | `Coder.s.Bible_2.1.0_amd64.deb` |
+| Fedora / RHEL | `Coder.s.Bible-2.1.0-1.x86_64.rpm` |
+| Other Linux | `Coder.s.Bible_2.1.0_amd64.AppImage` |
+
+> **Windows:** the binary is currently unsigned (no code-signing cert yet). Click "More info → Run anyway" if SmartScreen flags it.
+>
+> **macOS:** the .dmg is ad-hoc signed. Right-click the app the first time you launch it → "Open" to bypass Gatekeeper.
 
 ---
 
