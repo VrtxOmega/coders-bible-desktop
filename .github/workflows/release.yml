@@ -42,22 +42,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libsoup-3.0-dev libjavascriptcoregtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
 
-      - name: Generate macOS .icns from PNG
-        if: matrix.platform == 'macos-latest'
+      - name: Generate icon.icns from PNG (cross-platform)
+        shell: bash
         run: |
-          cd src-tauri/icons
-          mkdir icon.iconset
-          sips -z 16   16   128x128.png      --out icon.iconset/icon_16x16.png
-          sips -z 32   32   128x128.png      --out icon.iconset/icon_16x16@2x.png
-          sips -z 32   32   128x128.png      --out icon.iconset/icon_32x32.png
-          sips -z 64   64   128x128@2x.png   --out icon.iconset/icon_32x32@2x.png
-          sips -z 128  128  128x128.png      --out icon.iconset/icon_128x128.png
-          sips -z 256  256  128x128@2x.png   --out icon.iconset/icon_128x128@2x.png
-          sips -z 256  256  128x128@2x.png   --out icon.iconset/icon_256x256.png
-          sips -z 512  512  128x128@2x.png   --out icon.iconset/icon_256x256@2x.png
-          iconutil -c icns icon.iconset -o icon.icns
-          rm -rf icon.iconset
-          ls -la icon.icns
+          python -m pip install --quiet pillow
+          python - <<'PY'
+          from PIL import Image
+          src = Image.open('src-tauri/icons/128x128@2x.png').convert('RGBA')
+          src = src.resize((1024, 1024), Image.LANCZOS)
+          src.save('src-tauri/icons/icon.icns', format='ICNS')
+          print('icon.icns generated:', 'src-tauri/icons/icon.icns')
+          PY
+          ls -la src-tauri/icons/icon.icns
 
       - uses: tauri-apps/tauri-action@v0
         env:
