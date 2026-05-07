@@ -58,6 +58,11 @@ jobs:
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Ad-hoc sign macOS builds. We don't have an Apple Developer cert
+          # ($99/year + notarization), so '-' tells codesign to use ad-hoc
+          # signatures. The resulting .dmg installs fine after a one-time
+          # right-click → Open to clear Gatekeeper. Linux/Windows ignore this.
+          APPLE_SIGNING_IDENTITY: '-'
         with:
           tagName: ${{ github.ref_name }}
           releaseName: "Coder's Bible ${{ github.ref_name }}"
