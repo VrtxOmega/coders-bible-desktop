@@ -1,6 +1,12 @@
 // Coder's Bible Desktop — Tauri v2 Entry Point
 // Sovereign knowledge engine. Zero AI. Zero network.
 
+// Suppress the Windows console window in release builds. Without this attribute
+// the .exe is built as a console-subsystem app, so Windows attaches a console
+// host (Windows Terminal / conhost) on launch — which appeared as a phantom
+// "Coder's Bible" tab-strip window next to the main GUI.
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 use std::sync::Mutex;
 use tauri::{menu::*, tray::*, Manager, State};
 
