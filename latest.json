@@ -1,0 +1,23 @@
+{
+  "version": "v2.1.0",
+  "notes": "Coder's Bible v2.1.0 — Rust engine, Tauri desktop, PWA, VS Code extension, CLI companion.",
+  "pub_date": "2026-05-07T08:00:00Z",
+  "platforms": {
+    "darwin-x86_64": {
+      "signature": "Content of the .sig file",
+      "url": "https://github.com/vrtxomega/the-coders-bible/releases/download/v2.1.0/Coders.Bible_x64.app.tar.gz"
+    },
+    "darwin-aarch64": {
+      "signature": "Content of the .sig file",
+      "url": "https://github.com/vrtxomega/the-coders-bible/releases/download/v2.1.0/Coders.Bible_aarch64.app.tar.gz"
+    },
+    "linux-x86_64": {
+      "signature": "Content of the .sig file",
+      "url": "https://github.com/vrtxomega/the-coders-bible/releases/download/v2.1.0/coders-bible_2.1.0_amd64.AppImage"
+    },
+    "windows-x86_64": {
+      "signature": "Content of the .sig file",
+      "url": "https://github.com/vrtxomega/the-coders-bible/releases/download/v2.1.0/Coders.Bible_2.1.0_x64_en-US.msi"
+    }
+  }
+}
