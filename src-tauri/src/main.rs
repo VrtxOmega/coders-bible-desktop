@@ -2,7 +2,7 @@
 // Sovereign knowledge engine. Zero AI. Zero network.
 
 use std::sync::Mutex;
-use tauri::{menu::*, tray::*, Manager, State, WebviewUrl, WebviewWindowBuilder};
+use tauri::{menu::*, tray::*, Manager, State};
 
 mod bible_engine;
 use bible_engine::{AnalysisResult, BibleEngine, SearchResult, StatsResult};
@@ -66,14 +66,39 @@ fn setup_db(app: &tauri::App) -> Result<BibleEngine, Box<dyn std::error::Error>>
     Ok(BibleEngine::new(db_path.to_string_lossy().to_string()))
 }
 
+fn focus_main_window(app: &tauri::AppHandle) {
+    if let Some(window) = app.get_webview_window("mini").or_else(|| app.get_webview_window("main")) {
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let mut builder = tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
-        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(tauri_plugin_updater::Builder::new().build());
+
+    // Global shortcut plugin — desktop only. The plugin's handler is set on
+    // its Builder; .register() on the runtime API only takes the shortcut.
+    #[cfg(desktop)]
+    {
+        use tauri_plugin_global_shortcut::{Builder as GsBuilder, Code, Modifiers, Shortcut, ShortcutState};
+        let summon = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::SHIFT), Code::Space);
+        builder = builder.plugin(
+            GsBuilder::new()
+                .with_handler(move |app, shortcut, event| {
+                    if shortcut == &summon && event.state == ShortcutState::Pressed {
+                        focus_main_window(app);
+                    }
+                })
+                .build(),
+        );
+    }
+
+    builder
         .setup(|app| {
             let engine = setup_db(app).map_err(|e| e.to_string())?;
             app.manage(AppState { engine: Mutex::new(engine) });
@@ -86,35 +111,26 @@ pub fn run() {
             let _tray = TrayIconBuilder::new()
                 .icon(app.default_window_icon().unwrap().clone())
                 .menu(&menu)
-                .menu_on_left_click(true)
+                .show_menu_on_left_click(true)
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "quit" => {
                         app.exit(0);
                     }
                     "show" => {
-                        if let Some(window) = app.get_webview_window("main") {
-                            let _ = window.show();
-                            let _ = window.set_focus();
-                        }
+                        focus_main_window(app);
                     }
                     _ => {}
                 })
                 .build(app)?;
 
-            // Global shortcut: Ctrl+Shift+Space opens mini search window
+            // Register the global shortcut after the plugin is initialized
             #[cfg(desktop)]
             {
-                use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut};
-                let shortcut = Shortcut::new(Some(tauri::Modifiers::CONTROL | tauri::Modifiers::SHIFT), tauri::Key::Space);
-                app.global_shortcut().register(shortcut, move |app| {
-                    if let Some(window) = app.get_webview_window("mini") {
-                        let _ = window.show();
-                        let _ = window.set_focus();
-                    } else if let Some(window) = app.get_webview_window("main") {
-                        let _ = window.show();
-                        let _ = window.set_focus();
-                    }
-                })?;
+                use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut};
+                let shortcut = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::SHIFT), Code::Space);
+                if let Err(e) = app.global_shortcut().register(shortcut) {
+                    log::warn!("Failed to register Ctrl+Shift+Space global shortcut: {}", e);
+                }
             }
 
             Ok(())
